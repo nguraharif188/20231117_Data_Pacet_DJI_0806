@@ -1,24 +1,23 @@
 <!doctype html>
 <html lang="en">
-<head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="initial-scale=1,user-scalable=no,maximum-scale=1,width=device-width">
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <link rel="stylesheet" href="css/leaflet.css">
-    <link rel="stylesheet" href="css/L.Control.Layers.Tree.css">
-    <link rel="stylesheet" href="css/qgis2web.css">
-    <link rel="stylesheet" href="css/fontawesome-all.min.css">
-    <link rel="stylesheet" href="css/leaflet-measure.css">
-    <style>
-        html, body, #map {
-            width: 100%;
-            height: 100%;
-            padding: 0;
-            margin: 0;
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="initial-scale=1,user-scalable=no,maximum-scale=1,width=device-width">
+        <meta name="mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <link rel="stylesheet" href="css/leaflet.css">
+        <link rel="stylesheet" href="css/L.Control.Layers.Tree.css">
+        <link rel="stylesheet" href="css/qgis2web.css">
+        <link rel="stylesheet" href="css/fontawesome-all.min.css">
+        <link rel="stylesheet" href="css/leaflet-measure.css">
+        <style>
+        #map {
+            width: 1092px;
+            height: 830px;
         }
         #footer-overlay {
+            z-index: 500;
             position: absolute;
             bottom: 10px;
             left: 10px;
@@ -26,225 +25,995 @@
             padding: 5px;
             border-radius: 5px;
         }
-    </style>
-    <title></title>
-</head>
-<body>
-<div id="map"></div>
-<div id="footer-overlay"></div>
-<script src="js/qgis2web_expressions.js"></script>
-<script src="js/leaflet.js"></script>
-<script src="js/L.Control.Layers.Tree.min.js"></script>
-<script src="js/leaflet.rotatedMarker.js"></script>
-<script src="js/leaflet.pattern.js"></script>
-<script src="js/leaflet-hash.js"></script>
-<script src="js/Autolinker.min.js"></script>
-<script src="js/rbush.min.js"></script>
-<script src="js/labelgun.min.js"></script>
-<script src="js/labels.js"></script>
-<script src="js/leaflet-measure.js"></script>
-<script src="data/DJI_0806CONTOURS_2.js"></script>
-<script>
-    var highlightLayer;
-
-    function highlightFeature(e) {
-        highlightLayer = e.target;
-
-        if (e.target.feature.geometry.type === 'LineString' || e.target.feature.geometry.type === 'MultiLineString') {
-            highlightLayer.setStyle({
-                color: '#ffff00',
-            });
-        } else {
-            highlightLayer.setStyle({
-                fillColor: '#ffff00',
-                fillOpacity: 1
-            });
+        </style>
+        <title></title>
+    </head>
+    <body>
+        <div id="map">
+        </div>
+        <div id="footer-overlay"></div>
+        <script src="js/qgis2web_expressions.js"></script>
+        <script src="js/leaflet.js"></script>
+        <script src="js/L.Control.Layers.Tree.min.js"></script>
+        <script src="js/leaflet.rotatedMarker.js"></script>
+        <script src="js/leaflet.pattern.js"></script>
+        <script src="js/leaflet-hash.js"></script>
+        <script src="js/Autolinker.min.js"></script>
+        <script src="js/rbush.min.js"></script>
+        <script src="js/labelgun.min.js"></script>
+        <script src="js/labels.js"></script>
+        <script src="js/leaflet-measure.js"></script>
+        <script src="data/DTM_modified_3.js"></script>
+        <script src="data/databarumarkerderas_4.js"></script>
+        <script src="data/sawah1_5.js"></script>
+        <script src="data/sawah2_6.js"></script>
+        <script src="data/sawah3_7.js"></script>
+        <script src="data/sawah4_8.js"></script>
+        <script src="data/sawah5_9.js"></script>
+        <script src="data/sawah6_10.js"></script>
+        <script src="data/sawah7_11.js"></script>
+        <script src="data/sawah8_12.js"></script>
+        <script src="data/sawah9_13.js"></script>
+        <script src="data/sawah10_14.js"></script>
+        <script src="data/sawah11_15.js"></script>
+        <script src="data/sawah12_16.js"></script>
+        <script src="data/sawah13_17.js"></script>
+        <script src="data/sawah14_18.js"></script>
+        <script src="data/sawah15_19.js"></script>
+        <script src="data/sawah16_20.js"></script>
+        <script>
+        var map = L.map('map', {
+            zoomControl:false, maxZoom:28, minZoom:1
+        }).fitBounds([[-7.624074284458453,112.5354268960058],[-7.6228455457015,112.53705886303197]]);
+        var hash = new L.Hash(map);
+        map.attributionControl.setPrefix('<a href="https://github.com/tomchadwin/qgis2web" target="_blank">qgis2web</a> &middot; <a href="https://leafletjs.com" title="A JS library for interactive maps">Leaflet</a> &middot; <a href="https://qgis.org">QGIS</a>');
+        var autolinker = new Autolinker({truncate: {length: 30, location: 'smart'}});
+        // remove popup's row if "visible-with-data"
+        function removeEmptyRowsFromPopupContent(content, feature) {
+         var tempDiv = document.createElement('div');
+         tempDiv.innerHTML = content;
+         var rows = tempDiv.querySelectorAll('tr');
+         for (var i = 0; i < rows.length; i++) {
+             var td = rows[i].querySelector('td.visible-with-data');
+             var key = td ? td.id : '';
+             if (td && td.classList.contains('visible-with-data') && feature.properties[key] == null) {
+                 rows[i].parentNode.removeChild(rows[i]);
+             }
+         }
+         return tempDiv.innerHTML;
         }
-        highlightLayer.openPopup();
-    }
-
-    var map = L.map('map', {
-        zoomControl: true,
-        maxZoom: 28,
-        minZoom: 1
-    });
-
-    var hash = new L.Hash(map);
-
-    map.attributionControl.setPrefix('<a href="https://github.com/tomchadwin/qgis2web" target="_blank">qgis2web</a> &middot; <a href="https://leafletjs.com" title="A JS library for interactive maps">Leaflet</a> &middot; <a href="https://qgis.org">QGIS</a>');
-
-    var autolinker = new Autolinker({truncate: {length: 30, location: 'smart'}});
-
-    function removeEmptyRowsFromPopupContent(content, feature) {
-        var tempDiv = document.createElement('div');
-        tempDiv.innerHTML = content;
-        var rows = tempDiv.querySelectorAll('tr');
-        for (var i = 0; i < rows.length; i++) {
-            var td = rows[i].querySelector('td.visible-with-data');
-            var key = td ? td.id : '';
-            if (td && td.classList.contains('visible-with-data') && feature.properties[key] == null) {
-                rows[i].parentNode.removeChild(rows[i]);
-            }
-        }
-        return tempDiv.innerHTML;
-    }
-
-    document.querySelector(".leaflet-popup-pane").addEventListener("load", function (event) {
-        var tagName = event.target.tagName,
-            popup = map._popup;
-        // Also check if flag is already set.
-        if (tagName === "IMG" && popup && !popup._updated) {
-            popup._updated = true; // Set flag to prevent looping.
-            popup.update();
-        }
-    }, true);
-
-    var measureControl = new L.Control.Measure({
-        position: 'topleft',
-        primaryLengthUnit: 'feet',
-        secondaryLengthUnit: 'miles',
-        primaryAreaUnit: 'sqfeet',
-        secondaryAreaUnit: 'sqmiles'
-    });
-    measureControl.addTo(map);
-
-    document.getElementsByClassName('leaflet-control-measure-toggle')[0]
-        .innerHTML = '';
-    document.getElementsByClassName('leaflet-control-measure-toggle')[0]
-        .className += ' fas fa-ruler';
-
-    var bounds_group = new L.featureGroup([]);
-
-    function setBounds() {
-        if (bounds_group.getLayers().length) {
-            map.fitBounds(bounds_group.getBounds());
-        }
-    }
-
-    map.createPane('pane_GoogleSatellite_0');
-    map.getPane('pane_GoogleSatellite_0').style.zIndex = 400;
-    var layer_GoogleSatellite_0 = L.tileLayer('http://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', {
-        pane: 'pane_GoogleSatellite_0',
-        opacity: 1.0,
-        attribution: '',
-        minZoom: 1,
-        maxZoom: 28,
-    });
-    layer_GoogleSatellite_0;
-    map.addLayer(layer_GoogleSatellite_0);
-
-    map.createPane('pane_DJI_0806DEM_1');
-    map.getPane('pane_DJI_0806DEM_1').style.zIndex = 401;
-    var img_DJI_0806DEM_1 = 'data/DJI_0806DEM_1.png';
-    var img_bounds_DJI_0806DEM_1 = [[-7.6239494219132355, 112.53552236271219], [-7.6229591933410354, 112.53696013704639]];
-    var layer_DJI_0806DEM_1 = new L.imageOverlay(img_DJI_0806DEM_1,
-        img_bounds_DJI_0806DEM_1,
-        {pane: 'pane_DJI_0806DEM_1'});
-    bounds_group.addLayer(layer_DJI_0806DEM_1);
-    map.addLayer(layer_DJI_0806DEM_1);
-
-    function pop_DJI_0806CONTOURS_2(feature, layer) {
-        layer.on({
-            mouseout: function (e) {
-                for (var i in e.target._eventParents) {
-                    if (typeof e.target._eventParents[i].resetStyle === 'function') {
-                        e.target._eventParents[i].resetStyle(e.target);
-                    }
-                }
-                if (typeof layer.closePopup == 'function') {
-                    layer.closePopup();
-                } else {
-                    layer.eachLayer(function (feature) {
-                        feature.closePopup()
-                    });
-                }
-            },
-            mouseover: highlightFeature,
+        // add class to format popup if it contains media
+		function addClassToPopupIfMedia(content, popup) {
+			var tempDiv = document.createElement('div');
+			tempDiv.innerHTML = content;
+			if (tempDiv.querySelector('td img')) {
+				popup._contentNode.classList.add('media');
+					// Delay to force the redraw
+					setTimeout(function() {
+						popup.update();
+					}, 10);
+			} else {
+				popup._contentNode.classList.remove('media');
+			}
+		}
+        var zoomControl = L.control.zoom({
+            position: 'topleft'
+        }).addTo(map);
+        var measureControl = new L.Control.Measure({
+            position: 'topleft',
+            primaryLengthUnit: 'meters',
+            secondaryLengthUnit: 'kilometers',
+            primaryAreaUnit: 'sqmeters',
+            secondaryAreaUnit: 'hectares'
         });
-        var popupContent = '<table>\
+        measureControl.addTo(map);
+        document.getElementsByClassName('leaflet-control-measure-toggle')[0].innerHTML = '';
+        document.getElementsByClassName('leaflet-control-measure-toggle')[0].className += ' fas fa-ruler';
+        var bounds_group = new L.featureGroup([]);
+        function setBounds() {
+        }
+        map.createPane('pane_GoogleSatellite_0');
+        map.getPane('pane_GoogleSatellite_0').style.zIndex = 400;
+        var layer_GoogleSatellite_0 = L.tileLayer('http://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', {
+            pane: 'pane_GoogleSatellite_0',
+            opacity: 1.0,
+            attribution: '',
+            minZoom: 1,
+            maxZoom: 28,
+        });
+        layer_GoogleSatellite_0;
+        map.addLayer(layer_GoogleSatellite_0);
+        map.createPane('pane_ORTHOMOSAIC_georeferenced_1');
+        map.getPane('pane_ORTHOMOSAIC_georeferenced_1').style.zIndex = 401;
+        var img_ORTHOMOSAIC_georeferenced_1 = 'data/ORTHOMOSAIC_georeferenced_1.png';
+        var img_bounds_ORTHOMOSAIC_georeferenced_1 = [[-7.623917080856694,112.53548343759712],[-7.62290429916348,112.53698034258313]];
+        var layer_ORTHOMOSAIC_georeferenced_1 = new L.imageOverlay(img_ORTHOMOSAIC_georeferenced_1,
+                                              img_bounds_ORTHOMOSAIC_georeferenced_1,
+                                              {pane: 'pane_ORTHOMOSAIC_georeferenced_1'});
+        bounds_group.addLayer(layer_ORTHOMOSAIC_georeferenced_1);
+        map.addLayer(layer_ORTHOMOSAIC_georeferenced_1);
+        map.createPane('pane_DTM_modified_2');
+        map.getPane('pane_DTM_modified_2').style.zIndex = 402;
+        var img_DTM_modified_2 = 'data/DTM_modified_2.png';
+        var img_bounds_DTM_modified_2 = [[-7.623915548674445,112.53548338859602],[-7.622904262001511,112.53698216035482]];
+        var layer_DTM_modified_2 = new L.imageOverlay(img_DTM_modified_2,
+                                              img_bounds_DTM_modified_2,
+                                              {pane: 'pane_DTM_modified_2'});
+        bounds_group.addLayer(layer_DTM_modified_2);
+        map.addLayer(layer_DTM_modified_2);
+        function pop_DTM_modified_3(feature, layer) {
+            var popupContent = '<table>\
                     <tr>\
-                        <th scope="row">ELEVATION</th>\
-                        <td class="visible-with-data" id="ELEVATION">' + (feature.properties['ELEVATION'] !== null ? autolinker.link(feature.properties['ELEVATION'].toLocaleString()) : '') + '</td>\
+                        <td class="visible-with-data" id="Elevasi (m)"colspan="2"><strong>Elevasi (m)</strong><br />' + (feature.properties['Elevasi (m)'] !== null ? autolinker.link(feature.properties['Elevasi (m)'].toLocaleString()) : '') + '</td>\
                     </tr>\
                 </table>';
-        layer.bindPopup(popupContent, {maxHeight: 400});
-        var popup = layer.getPopup();
-        var content = popup.getContent();
-        var updatedContent = removeEmptyRowsFromPopupContent(content, feature);
-        popup.setContent(updatedContent);
-    }
+            var content = removeEmptyRowsFromPopupContent(popupContent, feature);
+			layer.on('popupopen', function(e) {
+				addClassToPopupIfMedia(content, e.popup);
+			});
+			layer.bindPopup(content, { maxHeight: 400 });
+        }
 
-    function style_DJI_0806CONTOURS_2_0() {
-        return {
-            pane: 'pane_DJI_0806CONTOURS_2',
-            opacity: 1,
-            color: 'rgba(0,0,0,1.0)',
-            dashArray: '',
-            lineCap: 'square',
-            lineJoin: 'bevel',
-            weight: 1.0,
-            fillOpacity: 0,
+        function style_DTM_modified_3_0() {
+            return {
+                pane: 'pane_DTM_modified_3',
+                opacity: 1,
+                color: 'rgba(0,0,0,1.0)',
+                dashArray: '',
+                lineCap: 'square',
+                lineJoin: 'bevel',
+                weight: 1.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+        }
+        map.createPane('pane_DTM_modified_3');
+        map.getPane('pane_DTM_modified_3').style.zIndex = 403;
+        map.getPane('pane_DTM_modified_3').style['mix-blend-mode'] = 'normal';
+        var layer_DTM_modified_3 = new L.geoJson(json_DTM_modified_3, {
+            attribution: '',
             interactive: true,
+            dataVar: 'json_DTM_modified_3',
+            layerName: 'layer_DTM_modified_3',
+            pane: 'pane_DTM_modified_3',
+            onEachFeature: pop_DTM_modified_3,
+            style: style_DTM_modified_3_0,
+        });
+        bounds_group.addLayer(layer_DTM_modified_3);
+        map.addLayer(layer_DTM_modified_3);
+        function pop_databarumarkerderas_4(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <td class="visible-with-data" id="Lokasi"colspan="2"><strong>Lokasi</strong><br />' + (feature.properties['Lokasi'] !== null ? autolinker.link(feature.properties['Lokasi'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td class="visible-with-data" id="Rata-rata"colspan="2"><strong>Rata-rata</strong><br />' + (feature.properties['Rata-rata'] !== null ? autolinker.link(feature.properties['Rata-rata'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td class="visible-with-data" id="Kategori"colspan="2"><strong>Kategori</strong><br />' + (feature.properties['Kategori'] !== null ? autolinker.link(feature.properties['Kategori'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            var content = removeEmptyRowsFromPopupContent(popupContent, feature);
+			layer.on('popupopen', function(e) {
+				addClassToPopupIfMedia(content, e.popup);
+			});
+			layer.bindPopup(content, { maxHeight: 400 });
         }
-    }
 
-    map.createPane('pane_DJI_0806CONTOURS_2');
-    map.getPane('pane_DJI_0806CONTOURS_2').style.zIndex = 402;
-    map.getPane('pane_DJI_0806CONTOURS_2').style['mix-blend-mode'] = 'normal';
-    var layer_DJI_0806CONTOURS_2 = new L.geoJson(json_DJI_0806CONTOURS_2, {
-        attribution: '',
-        interactive: true,
-        dataVar: 'json_DJI_0806CONTOURS_2',
-        layerName: 'layer_DJI_0806CONTOURS_2',
-        pane: 'pane_DJI_0806CONTOURS_2',
-        onEachFeature: pop_DJI_0806CONTOURS_2,
-        style: style_DJI_0806CONTOURS_2_0,
-    });
-    bounds_group.addLayer(layer_DJI_0806CONTOURS_2);
-    map.addLayer(layer_DJI_0806CONTOURS_2);
-
-    var baseMaps = {};
-    var overlaysTree = [
-        {label: '<img src="legend/DJI_0806CONTOURS_2.png" /> DJI_0806 CONTOURS', layer: layer_DJI_0806CONTOURS_2},
-        {label: "DJI_0806 DEM", layer: layer_DJI_0806DEM_1},
-        {label: "Google Satellite", layer: layer_GoogleSatellite_0},]
-    var lay = L.control.layers.tree(null, overlaysTree, {
-        //namedToggle: true,
-        //selectorBack: false,
-        //closedSymbol: '&#8862; &#x1f5c0;',
-        //openedSymbol: '&#8863; &#x1f5c1;',
-        //collapseAll: 'Collapse all',
-        //expandAll: 'Expand all',
-        collapsed: false,
-    });
-    lay.addTo(map);
-    setBounds();
-
-    L.ImageOverlay.include({
-        getBounds: function () {
-            return this._bounds;
+        function style_databarumarkerderas_4_0() {
+            return {
+                pane: 'pane_databarumarkerderas_4',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(114,155,111,1.0)',
+                interactive: true,
+            }
         }
-    });
-    resetLabels([layer_DJI_0806CONTOURS_2]);
-    map.on("zoomend", function () {
-        resetLabels([layer_DJI_0806CONTOURS_2]);
-    });
-    map.on("layeradd", function () {
-        resetLabels([layer_DJI_0806CONTOURS_2]);
-    });
-    map.on("layerremove", function () {
-        resetLabels([layer_DJI_0806CONTOURS_2]);
-    });
+        map.createPane('pane_databarumarkerderas_4');
+        map.getPane('pane_databarumarkerderas_4').style.zIndex = 404;
+        map.getPane('pane_databarumarkerderas_4').style['mix-blend-mode'] = 'normal';
+        var layer_databarumarkerderas_4 = new L.geoJson(json_databarumarkerderas_4, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_databarumarkerderas_4',
+            layerName: 'layer_databarumarkerderas_4',
+            pane: 'pane_databarumarkerderas_4',
+            onEachFeature: pop_databarumarkerderas_4,
+            style: style_databarumarkerderas_4_0,
+        });
+        bounds_group.addLayer(layer_databarumarkerderas_4);
+        map.addLayer(layer_databarumarkerderas_4);
+        function pop_sawah1_5(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <td class="visible-with-data" id="id"colspan="2"><strong>id</strong><br />' + (feature.properties['id'] !== null ? autolinker.link(feature.properties['id'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td class="visible-with-data" id="Tanaman"colspan="2"><strong>Tanaman</strong><br />' + (feature.properties['Tanaman'] !== null ? autolinker.link(feature.properties['Tanaman'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td class="visible-with-data" id="Umur"colspan="2"><strong>Umur</strong><br />' + (feature.properties['Umur'] !== null ? autolinker.link(feature.properties['Umur'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td class="visible-with-data" id="Last Updat"colspan="2"><strong>Last Updat</strong><br />' + (feature.properties['Last Updat'] !== null ? autolinker.link(feature.properties['Last Updat'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            var content = removeEmptyRowsFromPopupContent(popupContent, feature);
+			layer.on('popupopen', function(e) {
+				addClassToPopupIfMedia(content, e.popup);
+			});
+			layer.bindPopup(content, { maxHeight: 400 });
+        }
 
-    // Footer overlay
-    var footerOverlay = document.getElementById('footer-overlay');
+        function style_sawah1_5_0() {
+            return {
+                pane: 'pane_sawah1_5',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(198,25,152,0.6)',
+                interactive: true,
+            }
+        }
+        map.createPane('pane_sawah1_5');
+        map.getPane('pane_sawah1_5').style.zIndex = 405;
+        map.getPane('pane_sawah1_5').style['mix-blend-mode'] = 'normal';
+        var layer_sawah1_5 = new L.geoJson(json_sawah1_5, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_sawah1_5',
+            layerName: 'layer_sawah1_5',
+            pane: 'pane_sawah1_5',
+            onEachFeature: pop_sawah1_5,
+            style: style_sawah1_5_0,
+        });
+        bounds_group.addLayer(layer_sawah1_5);
+        map.addLayer(layer_sawah1_5);
+        function pop_sawah2_6(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <td class="visible-with-data" id="id"colspan="2"><strong>id</strong><br />' + (feature.properties['id'] !== null ? autolinker.link(feature.properties['id'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td class="visible-with-data" id="sawah 2"colspan="2"><strong>sawah 2</strong><br />' + (feature.properties['sawah 2'] !== null ? autolinker.link(feature.properties['sawah 2'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            var content = removeEmptyRowsFromPopupContent(popupContent, feature);
+			layer.on('popupopen', function(e) {
+				addClassToPopupIfMedia(content, e.popup);
+			});
+			layer.bindPopup(content, { maxHeight: 400 });
+        }
 
-    map.on('mousemove', function (e) {
-        var lat = e.latlng.lat.toFixed(6);
-        var lng = e.latlng.lng.toFixed(6);
-        footerOverlay.innerHTML = 'Latitude: ' + lat + ', Longitude: ' + lng;
-    });
+        function style_sawah2_6_0() {
+            return {
+                pane: 'pane_sawah2_6',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(255,31,94,0.6)',
+                interactive: true,
+            }
+        }
+        map.createPane('pane_sawah2_6');
+        map.getPane('pane_sawah2_6').style.zIndex = 406;
+        map.getPane('pane_sawah2_6').style['mix-blend-mode'] = 'normal';
+        var layer_sawah2_6 = new L.geoJson(json_sawah2_6, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_sawah2_6',
+            layerName: 'layer_sawah2_6',
+            pane: 'pane_sawah2_6',
+            onEachFeature: pop_sawah2_6,
+            style: style_sawah2_6_0,
+        });
+        bounds_group.addLayer(layer_sawah2_6);
+        map.addLayer(layer_sawah2_6);
+        function pop_sawah3_7(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <td class="visible-with-data" id="id"colspan="2"><strong>id</strong><br />' + (feature.properties['id'] !== null ? autolinker.link(feature.properties['id'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td class="visible-with-data" id="sawah 3"colspan="2"><strong>sawah 3</strong><br />' + (feature.properties['sawah 3'] !== null ? autolinker.link(feature.properties['sawah 3'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            var content = removeEmptyRowsFromPopupContent(popupContent, feature);
+			layer.on('popupopen', function(e) {
+				addClassToPopupIfMedia(content, e.popup);
+			});
+			layer.bindPopup(content, { maxHeight: 400 });
+        }
 
-</script>
-</body>
+        function style_sawah3_7_0() {
+            return {
+                pane: 'pane_sawah3_7',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(222,229,128,0.6)',
+                interactive: true,
+            }
+        }
+        map.createPane('pane_sawah3_7');
+        map.getPane('pane_sawah3_7').style.zIndex = 407;
+        map.getPane('pane_sawah3_7').style['mix-blend-mode'] = 'normal';
+        var layer_sawah3_7 = new L.geoJson(json_sawah3_7, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_sawah3_7',
+            layerName: 'layer_sawah3_7',
+            pane: 'pane_sawah3_7',
+            onEachFeature: pop_sawah3_7,
+            style: style_sawah3_7_0,
+        });
+        bounds_group.addLayer(layer_sawah3_7);
+        map.addLayer(layer_sawah3_7);
+        function pop_sawah4_8(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <td class="visible-with-data" id="id"colspan="2"><strong>id</strong><br />' + (feature.properties['id'] !== null ? autolinker.link(feature.properties['id'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td class="visible-with-data" id="sawah 4"colspan="2"><strong>sawah 4</strong><br />' + (feature.properties['sawah 4'] !== null ? autolinker.link(feature.properties['sawah 4'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            var content = removeEmptyRowsFromPopupContent(popupContent, feature);
+			layer.on('popupopen', function(e) {
+				addClassToPopupIfMedia(content, e.popup);
+			});
+			layer.bindPopup(content, { maxHeight: 400 });
+        }
+
+        function style_sawah4_8_0() {
+            return {
+                pane: 'pane_sawah4_8',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(191,255,53,0.6)',
+                interactive: true,
+            }
+        }
+        map.createPane('pane_sawah4_8');
+        map.getPane('pane_sawah4_8').style.zIndex = 408;
+        map.getPane('pane_sawah4_8').style['mix-blend-mode'] = 'normal';
+        var layer_sawah4_8 = new L.geoJson(json_sawah4_8, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_sawah4_8',
+            layerName: 'layer_sawah4_8',
+            pane: 'pane_sawah4_8',
+            onEachFeature: pop_sawah4_8,
+            style: style_sawah4_8_0,
+        });
+        bounds_group.addLayer(layer_sawah4_8);
+        map.addLayer(layer_sawah4_8);
+        function pop_sawah5_9(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <td class="visible-with-data" id="id"colspan="2"><strong>id</strong><br />' + (feature.properties['id'] !== null ? autolinker.link(feature.properties['id'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td class="visible-with-data" id="sawah 5"colspan="2"><strong>sawah 5</strong><br />' + (feature.properties['sawah 5'] !== null ? autolinker.link(feature.properties['sawah 5'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            var content = removeEmptyRowsFromPopupContent(popupContent, feature);
+			layer.on('popupopen', function(e) {
+				addClassToPopupIfMedia(content, e.popup);
+			});
+			layer.bindPopup(content, { maxHeight: 400 });
+        }
+
+        function style_sawah5_9_0() {
+            return {
+                pane: 'pane_sawah5_9',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(191,255,53,0.6)',
+                interactive: true,
+            }
+        }
+        map.createPane('pane_sawah5_9');
+        map.getPane('pane_sawah5_9').style.zIndex = 409;
+        map.getPane('pane_sawah5_9').style['mix-blend-mode'] = 'normal';
+        var layer_sawah5_9 = new L.geoJson(json_sawah5_9, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_sawah5_9',
+            layerName: 'layer_sawah5_9',
+            pane: 'pane_sawah5_9',
+            onEachFeature: pop_sawah5_9,
+            style: style_sawah5_9_0,
+        });
+        bounds_group.addLayer(layer_sawah5_9);
+        map.addLayer(layer_sawah5_9);
+        function pop_sawah6_10(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <td class="visible-with-data" id="id"colspan="2"><strong>id</strong><br />' + (feature.properties['id'] !== null ? autolinker.link(feature.properties['id'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td class="visible-with-data" id="sawah 6"colspan="2"><strong>sawah 6</strong><br />' + (feature.properties['sawah 6'] !== null ? autolinker.link(feature.properties['sawah 6'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            var content = removeEmptyRowsFromPopupContent(popupContent, feature);
+			layer.on('popupopen', function(e) {
+				addClassToPopupIfMedia(content, e.popup);
+			});
+			layer.bindPopup(content, { maxHeight: 400 });
+        }
+
+        function style_sawah6_10_0() {
+            return {
+                pane: 'pane_sawah6_10',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(222,229,128,0.6)',
+                interactive: true,
+            }
+        }
+        map.createPane('pane_sawah6_10');
+        map.getPane('pane_sawah6_10').style.zIndex = 410;
+        map.getPane('pane_sawah6_10').style['mix-blend-mode'] = 'normal';
+        var layer_sawah6_10 = new L.geoJson(json_sawah6_10, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_sawah6_10',
+            layerName: 'layer_sawah6_10',
+            pane: 'pane_sawah6_10',
+            onEachFeature: pop_sawah6_10,
+            style: style_sawah6_10_0,
+        });
+        bounds_group.addLayer(layer_sawah6_10);
+        map.addLayer(layer_sawah6_10);
+        function pop_sawah7_11(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <td class="visible-with-data" id="id"colspan="2"><strong>id</strong><br />' + (feature.properties['id'] !== null ? autolinker.link(feature.properties['id'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td class="visible-with-data" id="sawah 7"colspan="2"><strong>sawah 7</strong><br />' + (feature.properties['sawah 7'] !== null ? autolinker.link(feature.properties['sawah 7'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            var content = removeEmptyRowsFromPopupContent(popupContent, feature);
+			layer.on('popupopen', function(e) {
+				addClassToPopupIfMedia(content, e.popup);
+			});
+			layer.bindPopup(content, { maxHeight: 400 });
+        }
+
+        function style_sawah7_11_0() {
+            return {
+                pane: 'pane_sawah7_11',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(45,166,34,0.6)',
+                interactive: true,
+            }
+        }
+        map.createPane('pane_sawah7_11');
+        map.getPane('pane_sawah7_11').style.zIndex = 411;
+        map.getPane('pane_sawah7_11').style['mix-blend-mode'] = 'normal';
+        var layer_sawah7_11 = new L.geoJson(json_sawah7_11, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_sawah7_11',
+            layerName: 'layer_sawah7_11',
+            pane: 'pane_sawah7_11',
+            onEachFeature: pop_sawah7_11,
+            style: style_sawah7_11_0,
+        });
+        bounds_group.addLayer(layer_sawah7_11);
+        map.addLayer(layer_sawah7_11);
+        function pop_sawah8_12(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <td class="visible-with-data" id="id"colspan="2"><strong>id</strong><br />' + (feature.properties['id'] !== null ? autolinker.link(feature.properties['id'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td class="visible-with-data" id="sawah 8"colspan="2"><strong>sawah 8</strong><br />' + (feature.properties['sawah 8'] !== null ? autolinker.link(feature.properties['sawah 8'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            var content = removeEmptyRowsFromPopupContent(popupContent, feature);
+			layer.on('popupopen', function(e) {
+				addClassToPopupIfMedia(content, e.popup);
+			});
+			layer.bindPopup(content, { maxHeight: 400 });
+        }
+
+        function style_sawah8_12_0() {
+            return {
+                pane: 'pane_sawah8_12',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(45,166,34,0.6)',
+                interactive: true,
+            }
+        }
+        map.createPane('pane_sawah8_12');
+        map.getPane('pane_sawah8_12').style.zIndex = 412;
+        map.getPane('pane_sawah8_12').style['mix-blend-mode'] = 'normal';
+        var layer_sawah8_12 = new L.geoJson(json_sawah8_12, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_sawah8_12',
+            layerName: 'layer_sawah8_12',
+            pane: 'pane_sawah8_12',
+            onEachFeature: pop_sawah8_12,
+            style: style_sawah8_12_0,
+        });
+        bounds_group.addLayer(layer_sawah8_12);
+        map.addLayer(layer_sawah8_12);
+        function pop_sawah9_13(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <td class="visible-with-data" id="id"colspan="2"><strong>id</strong><br />' + (feature.properties['id'] !== null ? autolinker.link(feature.properties['id'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td class="visible-with-data" id="sawah 9"colspan="2"><strong>sawah 9</strong><br />' + (feature.properties['sawah 9'] !== null ? autolinker.link(feature.properties['sawah 9'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            var content = removeEmptyRowsFromPopupContent(popupContent, feature);
+			layer.on('popupopen', function(e) {
+				addClassToPopupIfMedia(content, e.popup);
+			});
+			layer.bindPopup(content, { maxHeight: 400 });
+        }
+
+        function style_sawah9_13_0() {
+            return {
+                pane: 'pane_sawah9_13',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(222,229,128,0.6)',
+                interactive: true,
+            }
+        }
+        map.createPane('pane_sawah9_13');
+        map.getPane('pane_sawah9_13').style.zIndex = 413;
+        map.getPane('pane_sawah9_13').style['mix-blend-mode'] = 'normal';
+        var layer_sawah9_13 = new L.geoJson(json_sawah9_13, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_sawah9_13',
+            layerName: 'layer_sawah9_13',
+            pane: 'pane_sawah9_13',
+            onEachFeature: pop_sawah9_13,
+            style: style_sawah9_13_0,
+        });
+        bounds_group.addLayer(layer_sawah9_13);
+        map.addLayer(layer_sawah9_13);
+        function pop_sawah10_14(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <td class="visible-with-data" id="id"colspan="2"><strong>id</strong><br />' + (feature.properties['id'] !== null ? autolinker.link(feature.properties['id'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td class="visible-with-data" id="sawah 10"colspan="2"><strong>sawah 10</strong><br />' + (feature.properties['sawah 10'] !== null ? autolinker.link(feature.properties['sawah 10'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            var content = removeEmptyRowsFromPopupContent(popupContent, feature);
+			layer.on('popupopen', function(e) {
+				addClassToPopupIfMedia(content, e.popup);
+			});
+			layer.bindPopup(content, { maxHeight: 400 });
+        }
+
+        function style_sawah10_14_0() {
+            return {
+                pane: 'pane_sawah10_14',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(255,31,94,0.6)',
+                interactive: true,
+            }
+        }
+        map.createPane('pane_sawah10_14');
+        map.getPane('pane_sawah10_14').style.zIndex = 414;
+        map.getPane('pane_sawah10_14').style['mix-blend-mode'] = 'normal';
+        var layer_sawah10_14 = new L.geoJson(json_sawah10_14, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_sawah10_14',
+            layerName: 'layer_sawah10_14',
+            pane: 'pane_sawah10_14',
+            onEachFeature: pop_sawah10_14,
+            style: style_sawah10_14_0,
+        });
+        bounds_group.addLayer(layer_sawah10_14);
+        map.addLayer(layer_sawah10_14);
+        function pop_sawah11_15(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <td class="visible-with-data" id="id"colspan="2"><strong>id</strong><br />' + (feature.properties['id'] !== null ? autolinker.link(feature.properties['id'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td class="visible-with-data" id="sawah 11"colspan="2"><strong>sawah 11</strong><br />' + (feature.properties['sawah 11'] !== null ? autolinker.link(feature.properties['sawah 11'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            var content = removeEmptyRowsFromPopupContent(popupContent, feature);
+			layer.on('popupopen', function(e) {
+				addClassToPopupIfMedia(content, e.popup);
+			});
+			layer.bindPopup(content, { maxHeight: 400 });
+        }
+
+        function style_sawah11_15_0() {
+            return {
+                pane: 'pane_sawah11_15',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(191,255,53,0.6)',
+                interactive: true,
+            }
+        }
+        map.createPane('pane_sawah11_15');
+        map.getPane('pane_sawah11_15').style.zIndex = 415;
+        map.getPane('pane_sawah11_15').style['mix-blend-mode'] = 'normal';
+        var layer_sawah11_15 = new L.geoJson(json_sawah11_15, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_sawah11_15',
+            layerName: 'layer_sawah11_15',
+            pane: 'pane_sawah11_15',
+            onEachFeature: pop_sawah11_15,
+            style: style_sawah11_15_0,
+        });
+        bounds_group.addLayer(layer_sawah11_15);
+        map.addLayer(layer_sawah11_15);
+        function pop_sawah12_16(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <td class="visible-with-data" id="id"colspan="2"><strong>id</strong><br />' + (feature.properties['id'] !== null ? autolinker.link(feature.properties['id'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td class="visible-with-data" id="sawah 12"colspan="2"><strong>sawah 12</strong><br />' + (feature.properties['sawah 12'] !== null ? autolinker.link(feature.properties['sawah 12'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            var content = removeEmptyRowsFromPopupContent(popupContent, feature);
+			layer.on('popupopen', function(e) {
+				addClassToPopupIfMedia(content, e.popup);
+			});
+			layer.bindPopup(content, { maxHeight: 400 });
+        }
+
+        function style_sawah12_16_0() {
+            return {
+                pane: 'pane_sawah12_16',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(222,229,128,0.6)',
+                interactive: true,
+            }
+        }
+        map.createPane('pane_sawah12_16');
+        map.getPane('pane_sawah12_16').style.zIndex = 416;
+        map.getPane('pane_sawah12_16').style['mix-blend-mode'] = 'normal';
+        var layer_sawah12_16 = new L.geoJson(json_sawah12_16, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_sawah12_16',
+            layerName: 'layer_sawah12_16',
+            pane: 'pane_sawah12_16',
+            onEachFeature: pop_sawah12_16,
+            style: style_sawah12_16_0,
+        });
+        bounds_group.addLayer(layer_sawah12_16);
+        map.addLayer(layer_sawah12_16);
+        function pop_sawah13_17(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <td class="visible-with-data" id="id"colspan="2"><strong>id</strong><br />' + (feature.properties['id'] !== null ? autolinker.link(feature.properties['id'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td class="visible-with-data" id="sawah 13"colspan="2"><strong>sawah 13</strong><br />' + (feature.properties['sawah 13'] !== null ? autolinker.link(feature.properties['sawah 13'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            var content = removeEmptyRowsFromPopupContent(popupContent, feature);
+			layer.on('popupopen', function(e) {
+				addClassToPopupIfMedia(content, e.popup);
+			});
+			layer.bindPopup(content, { maxHeight: 400 });
+        }
+
+        function style_sawah13_17_0() {
+            return {
+                pane: 'pane_sawah13_17',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(198,25,152,0.6)',
+                interactive: true,
+            }
+        }
+        map.createPane('pane_sawah13_17');
+        map.getPane('pane_sawah13_17').style.zIndex = 417;
+        map.getPane('pane_sawah13_17').style['mix-blend-mode'] = 'normal';
+        var layer_sawah13_17 = new L.geoJson(json_sawah13_17, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_sawah13_17',
+            layerName: 'layer_sawah13_17',
+            pane: 'pane_sawah13_17',
+            onEachFeature: pop_sawah13_17,
+            style: style_sawah13_17_0,
+        });
+        bounds_group.addLayer(layer_sawah13_17);
+        map.addLayer(layer_sawah13_17);
+        function pop_sawah14_18(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <td class="visible-with-data" id="id"colspan="2"><strong>id</strong><br />' + (feature.properties['id'] !== null ? autolinker.link(feature.properties['id'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td class="visible-with-data" id="sawah 14"colspan="2"><strong>sawah 14</strong><br />' + (feature.properties['sawah 14'] !== null ? autolinker.link(feature.properties['sawah 14'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            var content = removeEmptyRowsFromPopupContent(popupContent, feature);
+			layer.on('popupopen', function(e) {
+				addClassToPopupIfMedia(content, e.popup);
+			});
+			layer.bindPopup(content, { maxHeight: 400 });
+        }
+
+        function style_sawah14_18_0() {
+            return {
+                pane: 'pane_sawah14_18',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(222,229,128,0.6)',
+                interactive: true,
+            }
+        }
+        map.createPane('pane_sawah14_18');
+        map.getPane('pane_sawah14_18').style.zIndex = 418;
+        map.getPane('pane_sawah14_18').style['mix-blend-mode'] = 'normal';
+        var layer_sawah14_18 = new L.geoJson(json_sawah14_18, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_sawah14_18',
+            layerName: 'layer_sawah14_18',
+            pane: 'pane_sawah14_18',
+            onEachFeature: pop_sawah14_18,
+            style: style_sawah14_18_0,
+        });
+        bounds_group.addLayer(layer_sawah14_18);
+        map.addLayer(layer_sawah14_18);
+        function pop_sawah15_19(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <td class="visible-with-data" id="id"colspan="2"><strong>id</strong><br />' + (feature.properties['id'] !== null ? autolinker.link(feature.properties['id'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td class="visible-with-data" id="sawah 15"colspan="2"><strong>sawah 15</strong><br />' + (feature.properties['sawah 15'] !== null ? autolinker.link(feature.properties['sawah 15'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            var content = removeEmptyRowsFromPopupContent(popupContent, feature);
+			layer.on('popupopen', function(e) {
+				addClassToPopupIfMedia(content, e.popup);
+			});
+			layer.bindPopup(content, { maxHeight: 400 });
+        }
+
+        function style_sawah15_19_0() {
+            return {
+                pane: 'pane_sawah15_19',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(45,166,34,0.6)',
+                interactive: true,
+            }
+        }
+        map.createPane('pane_sawah15_19');
+        map.getPane('pane_sawah15_19').style.zIndex = 419;
+        map.getPane('pane_sawah15_19').style['mix-blend-mode'] = 'normal';
+        var layer_sawah15_19 = new L.geoJson(json_sawah15_19, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_sawah15_19',
+            layerName: 'layer_sawah15_19',
+            pane: 'pane_sawah15_19',
+            onEachFeature: pop_sawah15_19,
+            style: style_sawah15_19_0,
+        });
+        bounds_group.addLayer(layer_sawah15_19);
+        map.addLayer(layer_sawah15_19);
+        function pop_sawah16_20(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <td class="visible-with-data" id="id"colspan="2"><strong>id</strong><br />' + (feature.properties['id'] !== null ? autolinker.link(feature.properties['id'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td class="visible-with-data" id="sawah 16"colspan="2"><strong>sawah 16</strong><br />' + (feature.properties['sawah 16'] !== null ? autolinker.link(feature.properties['sawah 16'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            var content = removeEmptyRowsFromPopupContent(popupContent, feature);
+			layer.on('popupopen', function(e) {
+				addClassToPopupIfMedia(content, e.popup);
+			});
+			layer.bindPopup(content, { maxHeight: 400 });
+        }
+
+        function style_sawah16_20_0() {
+            return {
+                pane: 'pane_sawah16_20',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(133,182,245,0.6)',
+                interactive: true,
+            }
+        }
+        map.createPane('pane_sawah16_20');
+        map.getPane('pane_sawah16_20').style.zIndex = 420;
+        map.getPane('pane_sawah16_20').style['mix-blend-mode'] = 'normal';
+        var layer_sawah16_20 = new L.geoJson(json_sawah16_20, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_sawah16_20',
+            layerName: 'layer_sawah16_20',
+            pane: 'pane_sawah16_20',
+            onEachFeature: pop_sawah16_20,
+            style: style_sawah16_20_0,
+        });
+        bounds_group.addLayer(layer_sawah16_20);
+        map.addLayer(layer_sawah16_20);
+        var baseMaps = {};
+        var overlaysTree = [
+        {label: '<b>group1</b>', selectAllCheckbox: true, children: [
+            {label: '<img src="legend/sawah16_20.png" /> sawah 16', layer: layer_sawah16_20},
+            {label: '<img src="legend/sawah15_19.png" /> sawah 15', layer: layer_sawah15_19},
+            {label: '<img src="legend/sawah14_18.png" /> sawah 14', layer: layer_sawah14_18},
+            {label: '<img src="legend/sawah13_17.png" /> sawah 13', layer: layer_sawah13_17},
+            {label: '<img src="legend/sawah12_16.png" /> sawah 12', layer: layer_sawah12_16},
+            {label: '<img src="legend/sawah11_15.png" /> sawah 11', layer: layer_sawah11_15},
+            {label: '<img src="legend/sawah10_14.png" /> sawah 10', layer: layer_sawah10_14},
+            {label: '<img src="legend/sawah9_13.png" /> sawah 9', layer: layer_sawah9_13},
+            {label: '<img src="legend/sawah8_12.png" /> sawah 8', layer: layer_sawah8_12},
+            {label: '<img src="legend/sawah7_11.png" /> sawah 7', layer: layer_sawah7_11},
+            {label: '<img src="legend/sawah6_10.png" /> sawah 6', layer: layer_sawah6_10},
+            {label: '<img src="legend/sawah5_9.png" /> sawah 5', layer: layer_sawah5_9},
+            {label: '<img src="legend/sawah4_8.png" /> sawah 4', layer: layer_sawah4_8},
+            {label: '<img src="legend/sawah3_7.png" /> sawah 3', layer: layer_sawah3_7},
+            {label: '<img src="legend/sawah2_6.png" /> sawah 2', layer: layer_sawah2_6},
+            {label: '<img src="legend/sawah1_5.png" /> sawah 1', layer: layer_sawah1_5},]},
+            {label: '<img src="legend/databarumarkerderas_4.png" /> data baru marker deras', layer: layer_databarumarkerderas_4},
+            {label: '<img src="legend/DTM_modified_3.png" /> DTM_modified', layer: layer_DTM_modified_3},
+            {label: "DTM_modified", layer: layer_DTM_modified_2},
+            {label: "ORTHOMOSAIC_georeferenced", layer: layer_ORTHOMOSAIC_georeferenced_1},
+            {label: "Google Satellite", layer: layer_GoogleSatellite_0},]
+        var lay = L.control.layers.tree(null, overlaysTree,{
+            //namedToggle: true,
+            //selectorBack: false,
+            //closedSymbol: '&#8862; &#x1f5c0;',
+            //openedSymbol: '&#8863; &#x1f5c1;',
+            //collapseAll: 'Collapse all',
+            //expandAll: 'Expand all',
+            collapsed: true,
+        });
+        lay.addTo(map);
+        setBounds();
+        L.ImageOverlay.include({
+            getBounds: function () {
+                return this._bounds;
+            }
+        });
+        resetLabels([layer_DTM_modified_3]);
+        map.on("zoomend", function(){
+            resetLabels([layer_DTM_modified_3]);
+        });
+        map.on("layeradd", function(){
+            resetLabels([layer_DTM_modified_3]);
+        });
+        map.on("layerremove", function(){
+            resetLabels([layer_DTM_modified_3]);
+        });
+
+        // Footer overlay
+        var footerOverlay = document.getElementById('footer-overlay');
+
+        map.on('mousemove', function (e) {
+            var lat = e.latlng.lat.toFixed(6);
+            var lng = e.latlng.lng.toFixed(6);
+            footerOverlay.innerHTML = 'Latitude: ' + lat + ', Longitude: ' + lng;
+        });
+        </script>
+    </body>
 </html>
