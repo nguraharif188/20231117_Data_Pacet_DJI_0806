@@ -6,15 +6,25 @@
         <meta name="viewport" content="initial-scale=1,user-scalable=no,maximum-scale=1,width=device-width">
         <meta name="mobile-web-app-capable" content="yes">
         <meta name="apple-mobile-web-app-capable" content="yes">
+
+        <!-- Bootstrap CSS -->
+        <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+
         <link rel="stylesheet" href="css/leaflet.css">
         <link rel="stylesheet" href="css/L.Control.Layers.Tree.css">
         <link rel="stylesheet" href="css/qgis2web.css">
         <link rel="stylesheet" href="css/fontawesome-all.min.css">
         <link rel="stylesheet" href="css/leaflet-measure.css">
         <style>
-        html, body, #map {
+        html, body {
             width: 100%;
             height: 100%;
+            padding: 0;
+            margin: 0;
+        }
+        #map {
+            width: 100%;
+            height: calc(100% - 56px); /* Adjust based on the height of the navbar */
             padding: 0;
             margin: 0;
         }
@@ -22,6 +32,47 @@
         <title>PETA KECAMATAN PACET</title>
     </head>
     <body>
+        <!-- Navbar -->
+        <nav class="navbar navbar-expand-lg navbar-light bg-light">
+            <a class="navbar-brand" href="#">PETA KECAMATAN PACET</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse justify-content-end" id="navbarNavDropdown">
+                <ul class="navbar-nav">
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown1" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            Dropdown 1
+                        </a>
+                        <div class="dropdown-menu" aria-labelledby="navbarDropdown1">
+                            <a class="dropdown-item" href="#">Action 1</a>
+                            <a class="dropdown-item" href="#">Action 2</a>
+                            <a class="dropdown-item" href="#">Action 3</a>
+                        </div>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown2" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            Dropdown 2
+                        </a>
+                        <div class="dropdown-menu" aria-labelledby="navbarDropdown2">
+                            <a class="dropdown-item" href="#">Action 1</a>
+                            <a class="dropdown-item" href="#">Action 2</a>
+                            <a class="dropdown-item" href="#">Action 3</a>
+                        </div>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown3" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            Dropdown 3
+                        </a>
+                        <div class="dropdown-menu" aria-labelledby="navbarDropdown3">
+                            <a class="dropdown-item" href="#">Action 1</a>
+                            <a class="dropdown-item" href="#">Action 2</a>
+                            <a class="dropdown-item" href="#">Action 3</a>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </nav>
         <div id="map">
         </div>
         <script src="js/qgis2web_expressions.js"></script>
@@ -53,9 +104,15 @@
         <script src="data/sawah14_18.js"></script>
         <script src="data/sawah15_19.js"></script>
         <script src="data/sawah16_20.js"></script>
+        
+        <!-- Bootstrap JS, Popper.js, and jQuery -->
+        <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+        
         <script>
         var map = L.map('map', {
-            zoomControl:false, maxZoom:28, minZoom:18
+            zoomControl:false, maxZoom:28, minZoom:1
         })
         var hash = new L.Hash(map);
         map.attributionControl.setPrefix('<a href="https://github.com/tomchadwin/qgis2web" target="_blank">qgis2web</a> &middot; <a href="https://leafletjs.com" title="A JS library for interactive maps">Leaflet</a> &middot; <a href="https://qgis.org">QGIS</a>');
@@ -88,16 +145,16 @@
 				popup._contentNode.classList.remove('media');
 			}
 		}
-        var title = new L.Control({'position':'topright'});
-        title.onAdd = function (map) {
-            this._div = L.DomUtil.create('div', 'info');
-            this.update();
-            return this._div;
-        };
-        title.update = function () {
-            this._div.innerHTML = '<h2>PETA KECAMATAN PACET</h2>';
-        };
-        title.addTo(map);
+        // var title = new L.Control({'position':'topright'});
+        // title.onAdd = function (map) {
+        //     this._div = L.DomUtil.create('div', 'info');
+        //     this.update();
+        //     return this._div;
+        // };
+        // title.update = function () {
+        //     this._div.innerHTML = '<h2>PETA KECAMATAN PACET</h2>';
+        // };
+        // title.addTo(map);
         var abstract = new L.Control({'position':'bottomleft'});
         abstract.onAdd = function (map) {
             this._div = L.DomUtil.create('div',
