@@ -28,13 +28,20 @@
             padding: 0;
             margin: 0;
         }
+        .dropdown-menu {
+            max-width: 100; /* Set maximum width for dropdown menu */
+            white-space: normal; /* Allow text to wrap */
+        }
+        .dropdown-item {
+            white-space: normal; /* Allow text to wrap */
+        }
         </style>
         <title>PETA KECAMATAN PACET</title>
     </head>
     <body>
         <!-- Navbar -->
         <nav class="navbar navbar-expand-lg navbar-light bg-light">
-            <a class="navbar-brand" href="#">PETA KECAMATAN PACET</a>
+            <a class="navbar-brand" href="#">Kecamatan Pacet</a>
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
@@ -42,32 +49,32 @@
                 <ul class="navbar-nav">
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown1" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            Dropdown 1
+                            Pacet
                         </a>
                         <div class="dropdown-menu" aria-labelledby="navbarDropdown1">
-                            <a class="dropdown-item" href="#">Action 1</a>
-                            <a class="dropdown-item" href="#">Action 2</a>
-                            <a class="dropdown-item" href="#">Action 3</a>
+                            <a class="dropdown-item" href="https://sda-seven.vercel.app/">Topografi</a>
+                            <a class="dropdown-item" href="#">Irigasi</a>
+                            <a class="dropdown-item" href="#">Hasil Panen</a>
                         </div>
                     </li>
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown2" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            Dropdown 2
+                            Menganti
                         </a>
                         <div class="dropdown-menu" aria-labelledby="navbarDropdown2">
-                            <a class="dropdown-item" href="#">Action 1</a>
-                            <a class="dropdown-item" href="#">Action 2</a>
-                            <a class="dropdown-item" href="#">Action 3</a>
+                            <a class="dropdown-item" href="#">Topografi</a>
+                            <a class="dropdown-item" href="#">Irigasi</a>
+                            <a class="dropdown-item" href="#">Hasil Panen</a>
                         </div>
                     </li>
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown3" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            Dropdown 3
+                            Lendah
                         </a>
                         <div class="dropdown-menu" aria-labelledby="navbarDropdown3">
-                            <a class="dropdown-item" href="#">Action 1</a>
-                            <a class="dropdown-item" href="#">Action 2</a>
-                            <a class="dropdown-item" href="#">Action 3</a>
+                            <a class="dropdown-item" href="#">Topografi</a>
+                            <a class="dropdown-item" href="#">Irigasi</a>
+                            <a class="dropdown-item" href="#">Hasil Panen</a>
                         </div>
                     </li>
                 </ul>
@@ -112,7 +119,7 @@
         
         <script>
         var map = L.map('map', {
-            zoomControl:false, maxZoom:28, minZoom:1
+            zoomControl:false, maxZoom:28, minZoom:18
         })
         var hash = new L.Hash(map);
         map.attributionControl.setPrefix('<a href="https://github.com/tomchadwin/qgis2web" target="_blank">qgis2web</a> &middot; <a href="https://leafletjs.com" title="A JS library for interactive maps">Leaflet</a> &middot; <a href="https://qgis.org">QGIS</a>');
